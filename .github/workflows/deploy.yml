@@ -60,4 +60,4 @@ jobs:
       - name: Run S3 List Command (Prod)
         run: |
           echo "Running on Linux: $(lsb_release -d) - Prod Env"
-          aws s3 ls₹
+          aws s3 ls
