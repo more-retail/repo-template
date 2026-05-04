@@ -1,0 +1,63 @@
+name: Deploy AWS Infrastructure
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      target_env:
+        description: 'Environment to deploy'
+        required: true
+        type: choice
+        options:
+          - dev
+          - prod
+        default: 'dev'
+
+permissions:
+  id-token: write # Required for OIDC handshake
+  contents: read  # Required to checkout code
+
+jobs:
+  deploy-dev:
+    name: Deploy to Dev Environment
+    # Runs ONLY if manually triggered for dev
+    if: github.event_name == 'workflow_dispatch' && inputs.target_env == 'dev'
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.IAM_ROLE }} # Update if you have a dev specific role
+          aws-region: ap-south-1
+
+      - name: Run S3 List Command (Dev)
+        run: |
+          echo "Running on Linux: $(lsb_release -d) - DEV Env"
+          aws s3 ls
+
+  deploy-prod:
+    name: Deploy to Prod Environment
+    # Runs automatically on merge to main OR manually if triggered for prod
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && inputs.target_env == 'prod')
+    runs-on: ubuntu-latest
+    environment: prod
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.IAM_ROLE }} # Update if you have a prod specific role
+          aws-region: ap-south-1
+
+      - name: Run S3 List Command (Prod)
+        run: |
+          echo "Running on Linux: $(lsb_release -d) - Prod Env"
+          aws s3 ls₹

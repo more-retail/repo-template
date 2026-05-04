@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+env/
+.env
+.pytest_cache/
+
+# CDK
+.cdk.staging/
+cdk.out/
+
+# IDE
+.vscode/
+.idea/
+.DS_Store
+
+# Lambda artifacts
+lambda/lambda_code.zip
+
+# Graphify
+graphify-out/
